@@ -1,0 +1,32 @@
+# 定义用户名和密码
+$user = "root"
+$password = "dm66887777"
+
+# 定义远程文件路径和本地保存路径
+$remotePath = "/root/client.ovpn"
+$localPath = "D:\abc\"
+
+# 定义ips文件路径
+$ipsFile = "D:\abc\ips.txt"
+
+# 读取ips文件
+$servers = Get-Content -Path $ipsFile
+
+# 遍历服务器列表
+foreach ($server in $servers) {
+    # 构建scp命令
+    $command = "scp ${user}@${server}:${remotePath} ${localPath}"
+
+    # 使用plink（PuTTY的命令行工具）来处理密码
+    $plink = "D:\Program Files\PuTTY\plink.exe"  # 确保这是plink的正确路径
+
+    # 执行命令
+    & $plink -ssh -pw $password ${user}@${server} "cat ${remotePath} > ${localPath}${server}_file.txt"
+
+    # 检查命令是否成功执行
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Successfully downloaded from $server"
+    } else {
+        Write-Host "Failed to download from $server"
+    }
+}
